@@ -10,6 +10,8 @@
 
 import sys
 import time
+
+# My path looked like this: /Users/mallen2/OpenPATH_Data/e-mission-server
 sys.path.insert(0, input("Enter your path to the emission server: ") ) 
 import emission.storage.decorations.trip_queries as esdt
 import emission.storage.timeseries.builtin_timeseries as estbt
