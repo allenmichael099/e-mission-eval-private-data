@@ -1,18 +1,18 @@
 # Final mode functions
 def sensed_mode(mode):
-        if mode == "unknown":
+        if mode == "unknown":       # How should unknown and other be handled?
             return "Other"
         elif mode == "walking": 
             return "Walk"
-        elif mode == "bicycling":
+        elif mode == "bicycling":   # expand to bike, ebike, escooter
             return "Bike"
         elif mode ==  "bus": 
             return "Bus"
-        elif mode == "train":
+        elif mode == "train":     # collapsed with subway, tram, light rail because we lack intensities for those
             return "Train"
-        elif mode ==  "car": 
+        elif mode ==  "car":      # expand to Drove Alone and Shared Ride
             return "Drove Alone"
-        elif mode ==  "air_or_hsr":
+        elif mode ==  "air_or_hsr":   # keep as air for now
             return "air"
         elif mode == "subway": 
             return "Train"
