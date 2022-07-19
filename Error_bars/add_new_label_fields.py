@@ -3,10 +3,12 @@
 # This script adds the following fields to confirmed trips in Stage_analysis_timeseries:
 # label_assist_labels, sensed_mode, and algorithm_chosen.
 
-########################## IMPORTANT
+################ IMPORTANT
 # Make sure you are in an emission environment.
-# Make sure that when you run this script, you are in the e-mission-server folder.
+# Make sure that when you run this script, you are in a folder that has the conf folder from e-mission-server.
 # Otherwise, e-mission-server/emission/core/get_database.py can't find conf/storage/db.conf.sample
+# If you need it, you can copy the conf folder recursively to your current directory with: 
+# cp -r $EMISSION_SERVER_HOME/conf .
 
 import sys
 import time
