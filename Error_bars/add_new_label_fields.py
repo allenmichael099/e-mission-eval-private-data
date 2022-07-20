@@ -14,17 +14,18 @@ import sys
 import time
 
 # My path looked like this: /Users/mallen2/OpenPATH_Data/e-mission-server
-sys.path.insert(0, input("Enter your path to the emission server: ") ) 
+
+sys.path.insert(0, input("Enter your path to the emission server: ") )   # maybe I could try an emission import and then do this as a catch?
 import emission.storage.decorations.trip_queries as esdt
 import emission.storage.timeseries.builtin_timeseries as estbt
 import emission.core.wrapper.entry as ecwe
 
-from pymongo import MongoClient
-client = MongoClient()
-db = client.Stage_database
+# Get the Stage_analysis_timeseries collection
+import emission.core.get_database as edb
+Stage_analysis_timeseries = edb.get_analysis_timeseries_db()
 
 # Get all confirmed trips
-confirmed_trips = [doc for doc in db.Stage_analysis_timeseries.find({"metadata.key":"analysis/confirmed_trip"})]
+confirmed_trips = [doc for doc in Stage_analysis_timeseries.find({"metadata.key":"analysis/confirmed_trip"})]
 
 def get_label_assist_confidences(ct):
     inference = ct['data']["inferred_labels"]
