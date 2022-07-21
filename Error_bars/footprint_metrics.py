@@ -70,7 +70,7 @@ def get_inferred_energy_intervals(distances_by_mode, energy_rel_errors, intensit
 
         if len(energy_intensity) > 0:
             energy_estimate = dist*energy_intensity[0]
-            energy_interval = [energy_estimate*(1 + lower_rel_error), energy_estimate*(1+upper_rel_error)]
+            energy_interval = [energy_estimate*(1 - lower_rel_error), energy_estimate*(1+upper_rel_error)]
             inferred_energy_intervals[mode]= {"estimate": energy_estimate, "interval": energy_interval}
         else: continue
     return inferred_energy_intervals

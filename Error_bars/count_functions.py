@@ -39,21 +39,24 @@ def sensed_mode(mode):
         LIGHT_RAIL = 9  Train'''
 
 def get_final_mode(trip):
-    if  trip["algorithm_chosen"] == "sensing" and len(trip["sensed_mode"] > 0):
+     # A list of standard labels for each mode. Used to group custom labels as "Other"
+    accepted_modes = ["Walk", "Bike","e-bike","Scooter share", "Drove Alone", "Shared Ride", "Taxi/Uber/Lyft", "Bus", "Train", "Free Shuttle", "Air"]
+
+    if  trip["algorithm_chosen"] == "sensing" and len(trip["sensed_mode"]) > 0:
         sensed_label = max(trip["sensed_mode"], key=trip["sensed_mode"].get)
         final_mode = sensed_mode(sensed_label)
     else:  # how do we handle if there is no sensed and no inferred mode?
         label_category_labels = trip["label_assist_confidences"]["mode_confirm"]
         final_label_category_label = max(label_category_labels, key=label_category_labels.get)
 
-        if final_label_category_label not in accepted_labels["mode_confirm"]:
+        if final_label_category_label not in accepted_modes:
             final_mode = "Other"
         else:
             final_mode = final_label_category_label
 
     return final_mode
 
-def get_inferred_counts(inferred_trips):    
+def get_inferred_counts(inferred_trips, label_categories):    
     ''' Counts the number of times a given label value is inferred.
     Returns a dictionary by label type of a dictionary by label value of the number of inferred trips for each label value.
     eg {"mode_confirm": {bike: 1, car: 2, etc}, "purpose_confirm: {"shopping": 2, "Home": 3}, "replaced_mode": {"No travel": 5, "Car, drove alone": 2} '''
@@ -61,7 +64,7 @@ def get_inferred_counts(inferred_trips):
     all_inferred_counts = {} 
 
     # for each label type, get the counts for each of the possible label values
-    for label_type in LABEL_CATEGORIES:
+    for label_type in label_categories:
         all_inferred_counts[label_type] = {}
 
         for _,t in inferred_trips.iterrows():
@@ -99,7 +102,7 @@ def get_count_intervals(all_inferred_counts, label_categories, rel_count_errors)
             count = all_inferred_counts[label_type][final_label]
             lower_rel_error = rel_errors[final_label][0]  # this is negative
             upper_rel_error = rel_errors[final_label][1]
-            interval = [count*(1 + lower_rel_error), count*(1+upper_rel_error)]
+            interval = [count*(1 - lower_rel_error), count*(1+upper_rel_error)]
 
             count_intervals[label_type][final_label] = {"count": count, "interval": interval}
     return count_intervals
