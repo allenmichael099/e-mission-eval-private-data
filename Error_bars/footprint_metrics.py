@@ -1,6 +1,12 @@
 import count_functions as counts
 import pandas as pd
 
+
+
+
+
+
+##### The functions below are a rough idea of how to get only inferred label trip carbon and energy.
 # Impact metric functions
 def get_distances_by_mode(inferred_trips_df):
     # could modify this so we add a final mode column to the dataframe before this function is called.
