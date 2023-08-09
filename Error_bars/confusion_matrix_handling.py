@@ -189,6 +189,55 @@ def change_precision(confusion_mat,mode,new_precision):
 
     return cm
 
+'''
+Loop through a DF of trips and tally up label pairs. Pairs are made of 'primary_mode' and 'mode_confirm' labels.
+    (primary_mode column comes from get_primary_modes fcn in helper_functions.py)
+    Will match either by counts or by distance.
+Input: DF of raw trip data (data with a buncha extra info, one row per trip)
+Output: CM of pairs and their counts or distances (as a DF).
+'''
+def pair_matching(df, by_distances=False):
+    # make columns of sensed labels (primary_mode)
+    columns = {} # looks like {sensed_label: {user_label: count, user_label: count...}}
+    value = 1 # default is by counts, where we add one each time
+    for index, row in df.iterrows():
+        if by_distances: # if set to true, instead of adding one for each pair, we add distances
+            value = row['distance']
+        if row['primary_mode'] not in columns: # if sensed label not added as column yet
+            columns[row['primary_mode']] = {} # make column
+            columns[row['primary_mode']][row['mode_confirm']] = value
+        elif row['mode_confirm'] not in columns[row['primary_mode']]: #if user label not in sensed label column
+            columns[row['primary_mode']][row['mode_confirm']] = value
+        else: # else [sensed label, user label] pair already there
+            columns[row['primary_mode']][row['mode_confirm']] += value
+        
+    pairs = pd.DataFrame(columns)
+    return pairs
+
+'''
+Consolidate user labels (row labels, aka DF index labels) of a user_label, sensed_label CM that are basically the same by using some mode map dictionary.
+    If rows have the same label after mapping, they're combined by addition.
+    If rows have no user label, they're dropped.
+    If remove_unknown is true, unknown labels are also dropped.
+Input: DF, mapping dictionary (with the form {user label: standardized label})
+Output: DF with new index labels
+'''
+def map_labels(df, map, remove_unknown=True):
+    # do mapping
+    renamed_pairs = df.rename(index=map)
+    consolidated_pairs = renamed_pairs.groupby(level=0).aggregate(['sum'])
+
+    # remove the annoying "sum" part of the label that appears after aggregate
+    consolidated_pairs.columns=consolidated_pairs.columns.droplevel(1)
+    
+    # remove rows where user label is not in map if set
+    if remove_unknown:
+        for index, data in consolidated_pairs.iterrows():
+            if index not in map:
+                consolidated_pairs = consolidated_pairs.drop(labels = [index], axis = 0)
+    return consolidated_pairs
+
+
 
 # See the end of store_errors.ipynb for how this is created.
 MODE_MAPPING_DICT = {'drove_alone': 'Gas Car, drove alone',
